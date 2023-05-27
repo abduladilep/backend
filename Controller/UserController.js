@@ -1,4 +1,5 @@
 const User = require("../Model/UserModel");
+const Transaction = require("../Model/TransactionModel");
 const mongoose = require("mongoose");
 const bodyparser = require("body-parser");
 const date = require('date-and-time')
@@ -65,143 +66,6 @@ const allUsers = async (req, res) => {
 };
 
 
-
-// const collectionList=async(req,res)=>{
-//   try{
-//    const user=await User.find()
-//    const {collectionDate,collectionEndDate,collectionPeriod}=user
-//   console.log(collectionDate,"dateeeeeee");
-// const value = date.addDays(collectionDate, 7);
-// res.status(201).json(value); 
-
-
-// console.log("updated date and time : " + value)
-
-
-
-//   }catch(error){
-// console.log(error);
-//   }
-// }
-
-// const collectionList = async (req, res) => {
-//   try {
-//     const users = await User.find();
-//     const updatedDates = users.map((user) => {
-//       const { collectionDate } = user;
-//       const updatedDate = new Date(collectionDate);
-//       updatedDate.setDate(updatedDate.getDate() + 7);
-//       console.log("updated date: " , updatedDate);
-//       return updatedDate;
-//     });
-//     res.status(201).json(updatedDates);
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-
-
-
-// const collectionList = async (req, res) => {
-//   try {
-//     const users = await User.find();
-//     const updatedDates = users.map((user) => {
-//       const { collectionDate, collectionEndDate } = user;
-//       const updatedDatesForUser = [];
-//       for (let date = new Date(collectionDate); date <= new Date(collectionEndDate); date.setDate(date.getDate() + 1)) {
-//         if ((date - new Date(collectionDate)) % (7 * 24 * 60 * 60 * 1000) === 0) {
-//           updatedDatesForUser.push(new Date(date));
-//         }
-//       }
-//       console.log("updated dates for user: " , updatedDatesForUser);
-//       return updatedDatesForUser;
-//     });
-//     res.status(201).json(updatedDates);
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-
-
-
-
-// const collectionList = async (req, res) => {
-//   try {
-//     const users = await User.find();
-//     const updatedDates = users.map((user) => {
-//       const { collectionDate, collectionEndDate } = user;
-//       const updatedDatesForUser = [];
-//       const allWeeks=[]
-//       const today = new Date();
-//       for (let date = new Date(collectionDate); date <= new Date(collectionEndDate); date.setDate(date.getDate() + 1)) {
-//         if ((date - new Date(collectionDate)) % (7 * 24 * 60 * 60 * 1000) === 0) {
-//           const updatedDate = new Date(date);
-
-//           allWeeks.push(updatedDate);
-         
-//          console.log(allWeeks,"upupup");
-//          if (updatedDate.toDateString() === today.toDateString()) {
-//            updatedDatesForUser.push(updatedDate);
-
-//           }
-//         }
-//         // res.status(201).json(allWeeks);
-//       }
-//       console.log("updated dates for user: " , updatedDatesForUser);
-//       return updatedDatesForUser;
-//     });
-//     const todayDates = updatedDates.filter((dates) => dates.some((date) => date.toDateString() === new Date().toDateString()));
-//     res.status(201).json({todayDates});
-    
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-
-
-// const collectionList = async (req, res) => {
-//   try {
-//     const users = await User.find();
-//     const allWeeks=[]
-//     const updatedDates = users.map((user) => {
-//       const { collectionDate, collectionEndDate } = user;
-//       const updatedDatesForUser = [];
-//       const today = new Date();
-//       for (let date = new Date(collectionDate); date <= new Date(collectionEndDate); date.setDate(date.getDate() + 1)) {
-//         if ((date - new Date(collectionDate)) % (7 * 24 * 60 * 60 * 1000) === 0) {
-//           const updatedDate = new Date(date);
-//           allWeeks.push(updatedDate);
-//           console.log(allWeeks,"upupup");
-//           if (updatedDate.toDateString() === today.toDateString()) {
-//             updatedDatesForUser.push(updatedDate);
-//           }
-//         }
-//       }
-//       console.log("updated dates for user: " , updatedDatesForUser);
-//       return updatedDatesForUser;
-//     });
-    // if (updatedDatesForUser.length > 0) {
-    //   return {
-    //     user: {
-    //       name: user.name,
-    //       // add any other fields  you want to include
-    //     },
-    //     updatedDates: updatedDatesForUser,
-    //   };
-    // } else {
-    //   return null;
-    // }
-  // });  
-    // const todayDates = updatedDates.filter((dates) => dates.some((date) => date.toDateString() === new Date().toDateString()));
-    // const usersWithTodayDates = todayDates.map((dates) => dates.filter((date) => date.toDateString() === new Date().toDateString())[0]);
-    // const usersDetailsWithTodayDates = usersWithTodayDates.map((dates) => dates.user);
-//     res.status(201).json({ allWeeks: allWeeks, todayDates });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-
-
 // const collectionList = async (req, res) => {
 //   try {
 //     const users = await User.find();
@@ -249,6 +113,11 @@ const collectionList = async (req, res) => {
       const { collectionDate, collectionEndDate, id,TotalAmount,CollectionAmount } = user;
       console.log(id, "uuuu");
       console.log("amount", TotalAmount);
+
+      let main=TotalAmount;
+      let reducing=TotalAmount-CollectionAmount;
+      main=reducing
+      console.log("main",main);
 
       const updatedDatesForUser = [];
       const today = new Date();

@@ -69,13 +69,13 @@ const User = mongoose.Schema(
 
     Pending: [
       {
-        amount:Number,
+        amount:{type:String},
         date:{type:Date,default:Date.now}
       },
     ],
     Collected: [
       {
-        amount:Number,
+        amount:{type:String},
         date:{type:Date,default:Date.now}
       },
     ],

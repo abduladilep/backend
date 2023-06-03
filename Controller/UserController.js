@@ -30,7 +30,7 @@ const addUser = async (req, res) => {
     Address,
     GivenAmount,
     TotalAmount,
-    TotalAmountCopy:TotalAmount,
+    TotalAmountCopy: TotalAmount,
     CollectionAmount,
     IdProof,
     Photo,
@@ -40,10 +40,6 @@ const addUser = async (req, res) => {
     collectionPeriod,
     collectionEndDate,
   });
-
-  
-
-  
 
   try {
     console.log("bdshdsh");
@@ -118,6 +114,7 @@ const collectionList = async (req, res) => {
         id,
         TotalAmount,
         CollectionAmount,
+        TotalAmountCopy,
         Name,
       } = user;
       console.log(id, "uuuu");
@@ -185,78 +182,89 @@ const collectionList = async (req, res) => {
   }
 };
 
-
-
-
-
-
 const pay = async (req, res) => {
   const userId = req.params.id;
   const amount = req.body.CollectionAmount;
 
   try {
     const user = await User.findById(userId);
-    const { CollectionAmount, Collected, TotalAmountCopy, TotalAmountHistory, TotalAmount } = user;
-   
-    
+    const {
+      CollectionAmount,
+      Collected,
+      Pending,
+      TotalAmountCopy,
+      TotalAmountHistory,
+      TotalAmount,
+    } = user;
+
     const currentDate = new Date();
 
     let updatedTotalAmount = TotalAmountCopy - amount;
 
-    if (updatedTotalAmount < 0) {
-      updatedTotalAmount = 0;
+    console.log("TotalAmountCopy",TotalAmountCopy);
+
+    if (!TotalAmountHistory.includes(TotalAmount)) {
+      TotalAmountHistory.push(TotalAmount);
+      console.log("bh");
     }
 
-    // Push the updatedTotalAmount and the current TotalAmount to the TotalAmountHistory array
-    const updatedTotalAmountHistory = [...TotalAmountHistory, updatedTotalAmount ];
+    if (updatedTotalAmount < 0 ) {
 
-    if (amount < CollectionAmount) {
-      const remaining = CollectionAmount - amount;
+      res.status(401).json({"money morethan remaing amount"  :TotalAmountCopy});
 
-      console.log('updatedTotalAmount', updatedTotalAmount);
-      console.log('updatedTotalAmountHistory', updatedTotalAmountHistory);
-
-      // Update the user document
-      await User.findByIdAndUpdate(userId, {
-        $push: {
-          Pending: {
-            date: currentDate,
-            amount: remaining
-          },
-          Collected: {
-            date: currentDate,
-            amount: amount
-          }
-        },
-        TotalAmountCopy: updatedTotalAmount,
-        TotalAmountHistory:  updatedTotalAmountHistory
-      });
-
-      res.status(200).json('Amount is pending');
+      console.log("no moneyyy bahiiii");
     } else {
-      console.log('updatedTotalAmount', updatedTotalAmount);
-      console.log('updatedTotalAmountHistory', updatedTotalAmountHistory);
+      TotalAmountHistory.push(updatedTotalAmount);
 
-      // Update the user document
-      await User.findByIdAndUpdate(userId, {
-        $push: {
-          Collected: {
-            date: currentDate,
-            amount: amount
-          }
-        },
-        TotalAmountCopy: TotalAmount,
-        TotalAmountHistory: updatedTotalAmountHistory
-      });
+      if (amount < CollectionAmount) {
+        const remaining = CollectionAmount - amount;
 
-      res.status(200).json('Paid');
+        // Update the user document
+
+        await User.findByIdAndUpdate(userId, {
+          $push: {
+            Pending: {
+              date: currentDate,
+              amount: remaining,
+            },
+            Collected: {
+              date: currentDate,
+              amount: amount,
+            },
+          },
+          TotalAmountCopy: updatedTotalAmount,
+          TotalAmountHistory: TotalAmountHistory,
+        });
+
+        res.status(200).json("Amount is pending");
+        console.log("updatedTotalAmount", updatedTotalAmount);
+        console.log("TotalAmountHistory", TotalAmountHistory);
+        console.log("pedning amount updated", Pending);
+        console.log("collected amount updated", Collected);
+      } else {
+        // Update the user document
+        await User.findByIdAndUpdate(userId, {
+          $push: {
+            Collected: {
+              date: currentDate,
+              amount: amount,
+            },
+          },
+          TotalAmountCopy: updatedTotalAmount,
+          TotalAmountHistory: TotalAmountHistory,
+        });
+
+        res.status(200).json("Paid");
+
+        console.log("updatedTotalAmount", updatedTotalAmount);
+        console.log("TotalAmountHistory", TotalAmountHistory);
+      }
     }
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
   }
 };
-
 
 module.exports = {
   addUser,

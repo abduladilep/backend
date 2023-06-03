@@ -33,6 +33,10 @@ const User = mongoose.Schema(
       type: String,
       required: true,
     },
+    TotalAmountCopy: {
+      type: String,
+      // required: true,
+    },
     collectionPeriod: {
       type: String,
       required: true,
@@ -65,16 +69,30 @@ const User = mongoose.Schema(
 
     Pending: [
       {
-        type: String,
+        amount:Number,
+        date:{type:Date,default:Date.now}
       },
     ],
     Collected: [
       {
-        type: String,
+        amount:Number,
+        date:{type:Date,default:Date.now}
       },
     ],
+
+    TotalAmountHistory: [
+      {
+        // amount:Number,
+        // // date:{type:Date,default:Date.now}
+        type: String, 
+      },
+    ],
+   
   },
   { Timestamp: true }
 );
+
+
+
 
 module.exports = mongoose.model("User", User);

@@ -64,48 +64,13 @@ const allUsers = async (req, res) => {
   }
 };
 
-// const collectionList = async (req, res) => {
-//   try {
-//     const users = await User.find();
-//     const allWeeks=[]
-
-//     const updatedDates = users.map((user) => {
-//       const { collectionDate, collectionEndDate,id } = user;
-//       console.log(id,"uuuu");
-//       const updatedDatesForUser = [];
-//       const today = new Date();
-//       for (let date = new Date(collectionDate); date <= new Date(collectionEndDate); date.setDate(date.getDate() + 1)) {
-//         if ((date - new Date(collectionDate)) % (7 * 24 * 60 * 60 * 1000) === 0) {
-//           const updatedDate = new Date(date);
-
-//           allWeeks.push(updatedDate);
-
-//           if (updatedDate.toDateString() === today.toDateString()) {
-//            console.log(allWeeks,"upupup");
-//            updatedDatesForUser.push(updatedDate);
-
-//           }
-//         }
-//         // res.status(201).json(allWeeks);
-//       }
-//       console.log("updated dates for user: " , updatedDatesForUser);
-//       return updatedDatesForUser;
-//     });
-
-//     const todayDates = updatedDates.filter((dates) => dates.some((date) => date.toDateString() === new Date().toDateString()));
-//     console.log("todayyateeee",todayDates);
-//     res.status(201).json({ allWeeks: allWeeks,
-//       todayDates:todayDates});
-
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
 
 const collectionList = async (req, res) => {
   try {
     const users = await User.find();
     const allWeeks = [];
+   
+    console.log("Total amount",users.TotalAmountCopy);
 
     users.forEach((user) => {
       const {
@@ -115,11 +80,14 @@ const collectionList = async (req, res) => {
         TotalAmount,
         CollectionAmount,
         TotalAmountCopy,
+        Address, 
         Name,
+        MobileNo,
       } = user;
       console.log(id, "uuuu");
       console.log("amount", collectionDate);
       console.log("name", Name);
+      console.log("addss",Address);
 
       // let main=TotalAmount;
       // let reducing=TotalAmount-CollectionAmount;
@@ -148,12 +116,15 @@ const collectionList = async (req, res) => {
       }
 
       allWeeks.push({
-        // user: user,
         userId: id,
+        Name: Name,
         dates: updatedDatesForUser,
+        CollectionAmount: CollectionAmount,
+        Address:Address,
+        MobileNo:MobileNo
       });
 
-      console.log("updated dates for user:", updatedDatesForUser);
+      
     });
 
     // const todayDates = allWeeks.filter((user) => user.dates.some((date) => date.toDateString() === new Date().toDateString())).map((user) => user.Name);
@@ -163,19 +134,33 @@ const collectionList = async (req, res) => {
         (date) => date.toDateString() === new Date().toDateString()
       )
     );
+    
+   
 
     const todayDates = todayUsers.map((user) => ({
       date: user.dates.find(
         (date) => date.toDateString() === new Date().toDateString()
       ),
       userId: user.userId,
+      Name: user.Name,
+      CollectionAmount:user.CollectionAmount,
+      Address:user.Address,
+      MobileNo:user.MobileNo,
+
+      
+      
+      
     }));
+    
+
+    
 
     console.log("todayDates:", todayDates);
 
     res.status(201).json({
       allWeeks: allWeeks,
       todayDates: todayDates,
+    
     });
   } catch (error) {
     console.log(error);
@@ -195,6 +180,7 @@ const pay = async (req, res) => {
       TotalAmountCopy,
       TotalAmountHistory,
       TotalAmount,
+      
     } = user;
 
     const currentDate = new Date();
@@ -226,10 +212,12 @@ const pay = async (req, res) => {
             Pending: {
               date: currentDate,
               amount: remaining,
+              userId: userId
             },
             Collected: {
               date: currentDate,
               amount: amount,
+              userId: userId
             },
           },
           TotalAmountCopy: updatedTotalAmount,
@@ -248,6 +236,7 @@ const pay = async (req, res) => {
             Collected: {
               date: currentDate,
               amount: amount,
+              userId: userId
             },
           },
           TotalAmountCopy: updatedTotalAmount,

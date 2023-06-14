@@ -71,14 +71,24 @@ const User = mongoose.Schema(
       {
         amount:{type:String},
         date:{type:Date,default:Date.now},
-        userId:{type:String}
+        userId:{type:String},
+        state:{
+          type:String,
+          enum:["Pending", "Collected"],
+          default:"Pending"
+        }
       },
     ],
     Collected: [
       {
         amount:{type:String},
         date:{type:Date,default:Date.now},
-        userId:{type:String}
+        userId:{type:String},
+        state:{
+          type:String,
+          enum:["Pending", "Collected"],
+          default:"Pending"
+        }
       },
     ],
 

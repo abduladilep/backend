@@ -69,7 +69,7 @@ const User = mongoose.Schema(
 
     Pending: [
       {
-        amount:{type:String},
+        pendingAmount:{type:String},
         date:{type:Date,default:Date.now},
         userId:{type:String},
         state:{

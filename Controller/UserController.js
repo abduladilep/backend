@@ -144,8 +144,9 @@ const collectionList = async (req, res) => {
         $push: {
           Pending: {
             date: date,
-            amount: CollectionAmount,
+            pendingAmount: CollectionAmount,
             userId: userId,
+            state:"Pending"
           },
         },
       };
@@ -327,15 +328,16 @@ const pay = async (req, res) => {
   
         if (!pendingEntry) {
           // Add a new entry for the current date
-          user.Pending.push({ date: currentDate, amount: remaining, userId, state: "pending" });
+          user.Pending.push({ date: currentDate, pendingAmount: remaining, userId, state: "Pending" });
         } else {
           // Update the existing entry for the current date
-          pendingEntry.amount = remaining;
+          pendingEntry.pendingAmount = remaining;
+
         }
         
-        await user.Collected.push({ date: currentDate, amount, userId, state: "Pending" });
+        await user.Collected.push({ date: currentDate, amount, userId, state: "Collected" });
         user.TotalAmountCopy = updatedTotalAmount;
-  
+
         // Calculate the total sum of pending amounts with status "pending"
         //   console.log("item",item);
         // const totalPendingAmount = user.Pending.reduce((sum, item) => {

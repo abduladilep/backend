@@ -306,10 +306,10 @@ const pay = async (req, res) => {
   
     console.log("TotalAmountCopy", TotalAmountCopy);
   
-    if (!TotalAmountHistory.includes(TotalAmount)) {
-      TotalAmountHistory.push(TotalAmount);
-      console.log("bh");
-    }
+    // if (!TotalAmountHistory.includes(TotalAmount)) {
+    //   TotalAmountHistory.push(TotalAmount);
+    //   console.log("bh");
+    // }
   
     if (updatedTotalAmount < 0) {
       res.status(401).json({ "money more than remaining amount": TotalAmountCopy });

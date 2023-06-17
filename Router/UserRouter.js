@@ -5,7 +5,7 @@ const userController=require('../Controller/UserController')
 
 router.post('/addUser',userController.addUser)
 router.get('/allUsers',userController.allUsers)
-router.get('/pendingList',userController.pendingList)
+// router.get('/pendingList',userController.pendingList)
 
 router.get('/collectionList',userController.collectionList)
 router.post('/pay',userController.pay)

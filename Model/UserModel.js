@@ -74,7 +74,7 @@ const User = mongoose.Schema(
         userId:{type:String},
         state:{
           type:String,
-          enum:["Pending", "Collected"],
+          enum:["Pending", "Collected","PartialPayment"],
           default:"Pending"
         }
       },
@@ -86,7 +86,7 @@ const User = mongoose.Schema(
         userId:{type:String},
         state:{
           type:String,
-          enum:["Pending", "Collected"],
+          enum:["Pending", "Collected","PartialPayment"],
           default:"Pending"
         }
       },
@@ -99,6 +99,23 @@ const User = mongoose.Schema(
         type: String, 
       },
     ],
+
+    TotalPendingAmount:{
+      type:String
+  },
+  TotalProfit:{
+      type: String
+
+  },
+  TotalCollected:{
+      type: String
+
+  },
+  TodayProfit:[{
+     date: { type: Date, default: Date.now },
+     Profit:String
+  }]
+  
    
   },
   { Timestamp: true }

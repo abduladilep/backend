@@ -3,6 +3,8 @@ const Transaction = require("../Model/TransactionModel");
 const mongoose = require("mongoose");
 const bodyparser = require("body-parser");
 const date = require("date-and-time");
+const Admin = require("../Model/AdminModel");
+const bcrypt = require("bcrypt");
 
 // Add customer
 
@@ -172,21 +174,21 @@ const collectionList = async (req, res) => {
 
     //filtering todaydates, who only have pending as state
 
-    const filteredTodayDates = todayDates.filter((dateObj) => {
-			const { userId } = dateObj;
+    // const filteredTodayDates = todayDates.filter((dateObj) => {
+		// 	const { userId } = dateObj;
 
-			// Check if user.Pending is "Pending"
-			const user = users.find((user) => user.id === userId);
-			const isPending = user.Pending.some((item) => item.state === 'Pending');
-			return isPending;
-		});
+		// 	// Check if user.Pending is "Pending"
+		// 	const user = users.find((user) => user.id === userId);
+		// 	const isPending = user.Pending.some((item) => item.state === 'Pending');
+		// 	return isPending;
+		// });
 
 
 
  
     res.status(201).json({
       allWeeks: allWeeks,
-      todayDates: filteredTodayDates,
+      todayDates: todayDates,
     });
   } catch (error) {
     console.log(error);
@@ -194,8 +196,7 @@ const collectionList = async (req, res) => {
 };
 
 const pay = async (req, res) => {
-  //  const userId= req.params.id
-  //  const amount= req.body.CollectionAmount
+ 
   const userId = req.body.userId;
   const amount = req.body.amount;
   // const {userId, amount} =req.body;
@@ -216,7 +217,6 @@ const pay = async (req, res) => {
     const currentDate = new Date();
 
     let updatedTotalAmount = TotalAmountCopy -amount;
-    console.log(typeof updatedTotalAmount,"typeeeeeeeee of updated");
 
 
     const pendingcalc = TotalPendingAmount-amount
@@ -369,10 +369,349 @@ const pay = async (req, res) => {
 // };
 
 
+const transactionPay = async (req, res) => {
+  // const amount = req.body.amount;
+  // const userId = req.params.id;
+  const{userId,amount} = req.body
+  console.log(amount,userId),"jjjjjj";
+
+  try {
+    const user = await User.findById(userId);
+    let { TotalPendingAmount, TotalCollected,InterestPercentage,TotalAmountCopy,TotalAmountHistory,TotalAmount,TotalProfit } = user
+    console.log(TotalPendingAmount,"TotalPendingAmount",TotalCollected);
+
+    
+    const currentDate = new Date();
+    
+    let updatedTotalAmount = TotalAmountCopy -amount;
+    console.log(typeof updatedTotalAmount,"typeeeeeeeee of updated");
+    
+    
+    if (updatedTotalAmount < 0) {
+      res
+      .status(401)
+      .json({ "money more than remaining amount": TotalAmountCopy });
+      
+      console.log("no moneyyy bhaiiii");
+    } else {
+      console.log("iffffffffffffffffffff=====>");
+      TotalAmountHistory.push((updatedTotalAmount));
+      
+    }
+    
+
+    
+    // if (amount < TotalPendingAmount) {
+    //   console.log("amount is less than TotalPendingAmount");
+    //   TotalPendingAmount = parseInt(TotalPendingAmount) - parseInt(amount);
+    //   user.Pending.pendingAmount= parseInt(user.Pending.pendingAmount)-amount
+    //   console.log(user.Pending.pendingAmount,"........");
+    //   await user.save();
+    // } else {
+    //   TotalPendingAmount = 0;
+      
+    //   for (const pendingEntry of user.Pending) {
+    //     if (pendingEntry.date.toDateString() === currentDate.toDateString()) {
+          
+    //       pendingEntry.state = "Collected";
+    //       pendingEntry.pendingAmount="0"
+    //     }
+
+    //   }
+
+    // }
+
+    if (amount < TotalPendingAmount) {
+      console.log("amount is less than TotalPendingAmount");
+      TotalPendingAmount = parseInt(TotalPendingAmount) - parseInt(amount);
+      user.Pending.forEach(pendingEntry => {
+        if (pendingEntry.date.toDateString() === currentDate.toDateString()) {
+          pendingEntry.state = "Collected";
+          pendingEntry.pendingAmount -= amount;
+        }
+      });
+      await user.save();
+    } else {
+      TotalPendingAmount = 0;
+      user.Pending.forEach(pendingEntry => {
+        if (pendingEntry.date.toDateString() === currentDate.toDateString()) {
+          pendingEntry.state = "Collected";
+          pendingEntry.pendingAmount = 0;
+        }
+      });
+    }
+    
+
+    const profit = amount * (InterestPercentage / 100);
+    console.log(profit,"profit");
+
+    TotalCollected=TotalAmount-updatedTotalAmount
+
+    // TotalCollected = parseInt(TotalCollected) + parseInt(amount);
+    console.log(TotalCollected);
+    TotalProfit = (parseInt(TotalCollected) * parseFloat(user.InterestPercentage)) / 100;
+    console.log(TotalProfit);
+
+    await User.findByIdAndUpdate(userId, {
+      $push: {
+        Collected: {
+          date: currentDate,
+          amount: amount,
+          userId: userId,
+          state: "Collected",
+        },
+        TodayProfit: {
+          date: currentDate,
+          Profit: profit,
+        },
+      },
+      TotalAmountCopy: updatedTotalAmount,
+      TotalCollected:TotalCollected,
+      TotalPendingAmount,
+      TotalProfit    });
+
+console.log(TotalProfit,TotalCollected, user.InterestPercentage);
+
+    await user.save();
+
+
+    // Return the updated user or appropriate response
+    res.json(" send");
+  } catch (error) {
+    // Handle error
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
+
+const Signup = async (req, res) => {
+  try {
+  const { Username, Password, confirmPassword,Name } = req.body;
+  console.log("rreqq", req.body);
+    const hashedPassword = await bcrypt.hash(req.body.Password, 10);
+    console.log(hashedPassword,"hashedPassword");
+    const admin = Admin({
+      Username: Username,
+      Password: hashedPassword,
+      Name: name,
+
+    });
+    console.log("admin", admin);
+   const a= await admin.save()
+
+   console.log(a,"a");
+   req.session.Username=req.body.Username;
+    res.status(200).json(admin);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json("Signup Failed");
+  }
+};
+
+
+
+
+const Login = async (req, res, next) => {
+  const { Username, Password } = req.body;
+
+  const admin = await Admin.findOne({ Username: Username });
+  
+  if (!admin) {
+    return res.status(401).send('Invalid username or password');
+  }
+  
+  const validPassword = await bcrypt.compare(Password, admin.Password);
+
+  if (validPassword) {
+    // req.session.Username = admin.Username;
+    res.send('Login successful');
+  }
+  else {
+   console.log('invalid', 'invalid username or password');
+  }
+
+}
+
+
+// delete customer
+
+const deleteUser = async (req, res) => {
+  const id = req.params.id;
+  try {
+    await User.findByIdAndDelete(id);
+    res.status(200).json('customer deleted');
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+//update customer
+
+const updateUser = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const user = await User.findByIdAndUpdate(id, req.body, { new: true });
+    res.status(200).json({ user });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+};
+
+
+const Logout = (req, res) => {
+  try {
+    req.session.destroy()
+    console.log("logout");
+  } catch (error) {
+    console.log(error.message)
+
+ }
+}
+
+
+const search = async (req, res) => {
+  const searchdata = req.body.search
+  showUser = await User.find({
+
+      // Firstname: searchdata
+      $or: [
+          { Name: { $regex: ".*" + searchdata + ".*" } },
+          // { Lastname: { $regex: ".*" + searchdata + ".*" } },
+
+      ],
+  })
+
+
+
+  res.redirect('/api/user/userdata')
+
+}
+
+
+
+const  userdata = async (req, res) => {
+  console.log(req.session.username)
+  if (req.session.username) {
+      console.log("session")
+      res.render('userdata', { data: showUser })
+      showUser = await User.find()
+  } else {
+      
+      res.redirect('/users/adminlogin')
+  }
+}
+
 
 module.exports = {
   addUser,
   allUsers,
   collectionList,
   pay,
+  transactionPay,
+  Login,
+  Signup,
+  deleteUser,
+  updateUser,
+  Logout
 };
+
+
+
+
+
+//search user
+// export const searchUser = async (req, res) => {
+//   try {
+//     const keyword = req.query.name || "";
+//     const users = await UserModel.find({
+//       $or: [
+//         { username: { $regex: keyword, $options: "i" } },
+//         { firstname: { $regex: keyword, $options: "i" } },
+//         { lastname: { $regex: keyword, $options: "i" } },
+//       ],
+//     }).select({ username: 1, firstname: 1, lastname: 1, profilePicture: 1 });
+//     res.status(200).json(users);
+//   } catch (err) {
+//     res.status(404).json({err,message:'Not found'});
+//     console.log(err);
+//   }
+// };
+
+
+
+// import React from "react";
+// import "./Search.css";
+// import { Link } from "react-router-dom";
+// import useSearchUsers from "../../hooks/useSearchUsers";
+// const serverPublic = process.env.REACT_APP_PUBLIC_FOLDER;
+
+// const Search = ({ searchKey }) => {
+//   const { users, loading, error } = useSearchUsers(searchKey);
+//   return (
+//     users.length > 0 && (
+//       <div className="search-result">
+//         {users?.map((user) => (
+//           <div key={user._id} className="search-items">
+//             <img
+//               src={
+//                 user?.profilePicture
+//                   ? serverPublic + user.profilePicture
+//                   : serverPublic + "defaultProfile.png"
+//               }
+//               alt=""
+//             />
+//             <div className="search-name">
+//               <span>
+//                 <Link to={`/profile/${user._id}`}>
+//                   {user.firstname} {user.lastname}
+//                 </Link>
+//               </span>
+//               <span>
+//                 <Link to={`/profile/${user._id}`}>{user.username}</Link>
+//               </span>
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+//     )
+//   );
+// };
+
+// export default Search;
+
+
+// import React from "react";
+// import Logo from "../../img/logo.png";
+// import { UilSearch } from "@iconscout/react-unicons";
+// import "./LogoSearch.css";
+// import { Link } from "react-router-dom";
+// import { useState } from "react";
+// import Search from "../Search/Search";
+
+// const LogoSearch = () => {
+  
+//   const [searchKey, setSearchKey] = useState("");
+//   return (
+//     <div className="LogoSearch">
+//       <Link to="/home">
+//         <img src={Logo} alt="" />
+//       </Link>
+//       <div className="Search">
+//         <input
+//           type="text"
+//           placeholder="Search"
+//           onChange={(e) => setSearchKey(e.target.value)}
+//         />
+//         <div className="s-icon">
+//           <UilSearch />
+//         </div>
+//         {searchKey.trim().length > 0 && <Search searchKey={searchKey} />}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default LogoSearch;

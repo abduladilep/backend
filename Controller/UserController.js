@@ -172,23 +172,23 @@ const collectionList = async (req, res) => {
       }
     }
 
-    //filtering todaydates, who only have pending as state
+    // filtering todaydates, who only have pending as state
 
-    // const filteredTodayDates = todayDates.filter((dateObj) => {
-		// 	const { userId } = dateObj;
+    const filteredTodayDates = todayDates.filter((dateObj) => {
+			const { userId } = dateObj;
 
-		// 	// Check if user.Pending is "Pending"
-		// 	const user = users.find((user) => user.id === userId);
-		// 	const isPending = user.Pending.some((item) => item.state === 'Pending');
-		// 	return isPending;
-		// });
+			// Check if user.Pending is "Pending"
+			const user = users.find((user) => user.id === userId);
+			const isPending = user.Pending.some((item) => item.state === 'Pending');
+			return isPending;
+		});
 
 
 
  
     res.status(201).json({
       allWeeks: allWeeks,
-      todayDates: todayDates,
+      todayDates: filteredTodayDates,
     });
   } catch (error) {
     console.log(error);
@@ -550,7 +550,8 @@ const deleteUser = async (req, res) => {
 //update customer
 
 const updateUser = async (req, res) => {
-  const id = req.params.id;
+  const id = req.body.id;
+  console.log("reqqqq",req.body);
   try {
     const user = await User.findByIdAndUpdate(id, req.body, { new: true });
     res.status(200).json({ user });
@@ -569,39 +570,6 @@ const Logout = (req, res) => {
     console.log(error.message)
 
  }
-}
-
-
-const search = async (req, res) => {
-  const searchdata = req.body.search
-  showUser = await User.find({
-
-      // Firstname: searchdata
-      $or: [
-          { Name: { $regex: ".*" + searchdata + ".*" } },
-          // { Lastname: { $regex: ".*" + searchdata + ".*" } },
-
-      ],
-  })
-
-
-
-  res.redirect('/api/user/userdata')
-
-}
-
-
-
-const  userdata = async (req, res) => {
-  console.log(req.session.username)
-  if (req.session.username) {
-      console.log("session")
-      res.render('userdata', { data: showUser })
-      showUser = await User.find()
-  } else {
-      
-      res.redirect('/users/adminlogin')
-  }
 }
 
 

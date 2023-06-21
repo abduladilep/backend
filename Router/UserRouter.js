@@ -12,7 +12,7 @@ router.get('/collectionList',userController.collectionList)
 router.post('/pay',userController.pay)
 router.post('/transactionPay',userController.transactionPay)
 router.delete('/deleteUser/:id',userController.deleteUser)
-router.put('/updateUser/:id',userController.updateUser)
+router.post('/updateUser',userController.updateUser)
 
 
 module.exports=router

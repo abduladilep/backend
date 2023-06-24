@@ -1,10 +1,11 @@
 const User = require("../Model/UserModel");
-const Transaction = require("../Model/TransactionModel");
+const Transaction = require("../Model/otpVerify");
 const mongoose = require("mongoose");
 const bodyparser = require("body-parser");
 const date = require("date-and-time");
 const Admin = require("../Model/AdminModel");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 // Add customer
 
@@ -396,9 +397,11 @@ const transactionPay = async (req, res) => {
     } else {
       console.log("iffffffffffffffffffff=====>");
       TotalAmountHistory.push((updatedTotalAmount));
+
       
-    }
     
+    
+
 
     
     // if (amount < TotalPendingAmount) {
@@ -476,7 +479,8 @@ console.log(TotalProfit,TotalCollected, user.InterestPercentage);
 
 
     // Return the updated user or appropriate response
-    res.json(" send");
+    res.json("send");
+    }
   } catch (error) {
     // Handle error
     console.log(error);
@@ -486,24 +490,78 @@ console.log(TotalProfit,TotalCollected, user.InterestPercentage);
 
 
 
+// const Signup = async (req, res) => {
+//   try {
+//   const { Username, Password, confirmPassword,Name } = req.body;
+//   console.log("rreqq", req.body);
+//     const hashedPassword = await bcrypt.hash(req.body.Password, 10);
+//     console.log(hashedPassword,"hashedPassword");
+//     const admin = Admin({
+//       Username: Username,
+//       Password: hashedPassword,
+//       Name: name,
+
+//     });
+//     console.log("admin", admin);
+//    const a= await admin.save()
+
+//    console.log(a,"a");
+//    req.session.Username=req.body.Username;
+//     res.status(200).json(admin);
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json("Signup Failed");
+//   }
+// };
+
+
+
+
+// const Login = async (req, res, next) => {
+//   const { Username, Password } = req.body;
+
+//   const admin = await Admin.findOne({ Username: Username });
+  
+//   if (!admin) {
+//     return res.status(401).send('Invalid username or password');
+//   }
+  
+//   const validPassword = await bcrypt.compare(Password, admin.Password);
+
+//   if (validPassword) {
+//     // req.session.Username = admin.Username;
+//     res.send('Login successful');
+//   }
+//   else {
+//    console.log('invalid', 'invalid username or password');
+//   }
+
+// }
+
 const Signup = async (req, res) => {
   try {
-  const { Username, Password, confirmPassword,Name } = req.body;
+    const { email, password, confirmPassword,name,mobile } = req.body;
   console.log("rreqq", req.body);
-    const hashedPassword = await bcrypt.hash(req.body.Password, 10);
+
+    // const oldUser = await Admin.findOne({ mobile:mobile })
+    // console.log("old", oldUser);
+    // if (oldUser) {
+    //   return res.status(400).json({ message: "Username  already exist" })
+    // }
+
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
     console.log(hashedPassword,"hashedPassword");
     const admin = Admin({
-      Username: Username,
-      Password: hashedPassword,
-      Name: name,
+      email: email,
+      password: hashedPassword,
+      mobile:mobile,
+      name: name,
 
     });
-    console.log("admin", admin);
-   const a= await admin.save()
-
-   console.log(a,"a");
-   req.session.Username=req.body.Username;
-    res.status(200).json(admin);
+    console.log("admin====>", admin);
+    const newAdmin=await admin.save()
+    console.log("Password",newAdmin);
+    res.status(200).json({ status:"ok"});
   } catch (error) {
     console.log(error);
     res.status(500).json("Signup Failed");
@@ -514,24 +572,34 @@ const Signup = async (req, res) => {
 
 
 const Login = async (req, res, next) => {
-  const { Username, Password } = req.body;
+  const { name, password,mobile } = req.body;
+  console.log(req.body,"qqqqqqqqqqqqqqqqqq");
 
-  const admin = await Admin.findOne({ Username: Username });
-  
-  if (!admin) {
-    return res.status(401).send('Invalid username or password');
-  }
-  
-  const validPassword = await bcrypt.compare(Password, admin.Password);
+  const admin = await Admin.findOne({ mobile: mobile });
+  if (admin) {
+    const validPassword = await bcrypt.compare(password, admin.password);
 
+    console.log("validPassword", validPassword);
   if (validPassword) {
+    console.log("innnnn");
     // req.session.Username = admin.Username;
-    res.send('Login successful');
+    // console.log("session", req.session.Username);
+
+    const token = jwt.sign({
+
+      mobile: admin.mobile, id: admin._id
+    }, 
+    "secret123", { expiresIn: '1h' })
+
+    console.log(token);
+    res.status(200).json({ admin, token })
+
   }
   else {
    console.log('invalid', 'invalid username or password');
-  }
+}
 
+}
 }
 
 

@@ -1,18 +1,24 @@
 const express = require('express');
 const router = express.Router();
-const userController=require('../Controller/UserController')
+const {Signup,Login,addUser,allUsers,collectionList,pay,transactionPay,deleteUser,updateUser} = require('../Controller/UserController');
+const {sendOTPVerificationEmail,otpVerify}=require('../Controller/otpController')
+const {validateUserToken}=require('../Middleware/jwtAuth')
 
-router.post('/signup',userController.Signup)
-router.get('/login',userController.Login)
-router.post('/addUser',userController.addUser)
-router.get('/allUsers',userController.allUsers)
+router.post('/signup',Signup)
+router.post('/otpsend',sendOTPVerificationEmail);
+router.post('/verifyotp', otpVerify);
+router.post('/login',Login)
+
+
+router.post('/addUser',addUser)
+router.get('/allUsers',allUsers)
 // router.get('/pendingList',userController.pendingList)
 
-router.get('/collectionList',userController.collectionList)
-router.post('/pay',userController.pay)
-router.post('/transactionPay',userController.transactionPay)
-router.delete('/deleteUser/:id',userController.deleteUser)
-router.post('/updateUser',userController.updateUser)
+router.get('/collectionList',collectionList)
+router.post('/pay',pay)
+router.post('/transactionPay',transactionPay)
+router.delete('/deleteUser/:id',deleteUser)
+router.post('/updateUser',updateUser)
 
 
 module.exports=router

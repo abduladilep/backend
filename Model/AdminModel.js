@@ -2,18 +2,23 @@ const { Timestamp, ObjectId } = require("mongodb");
 const mongoose = require("mongoose");
 const Admin = mongoose.Schema(
   {
-    Name: {
+    name: {
       type: String,
       required: true,
       // unique: true
     },
-  
-    Username: {
+    mobile:{
       type: String,
       required: true,
       unique: true
     },
-    Password: {
+  
+    email: {
+      type: String,
+      required: true,
+      // unique: true
+    },
+    password: {
       type: String,
       required: true,
       // unique: true

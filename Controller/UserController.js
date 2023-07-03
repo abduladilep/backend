@@ -641,6 +641,76 @@ const Logout = (req, res) => {
 }
 
 
+// admin Details
+
+
+// const adminDetails = async (req, res) => {
+//   try {
+//     // if (superAdmin) {
+//       const admin = await Admin.find()
+//       // console.log(admin);
+//       res.status(200).json(admin);
+//     // }
+
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json(error)
+//   }
+
+// }
+
+// admins delite
+
+const adminDelete = async (req, res) => {
+const { adminId} =req.body;
+console.log(adminId,"amdiniddd");
+  
+  try {
+    console.log("tryyyyy");
+    const deletedAdmin =await Admin.findByIdAndDelete(adminId);
+
+    if (!deletedAdmin) {
+      return res.status(404).json("Admin not found");
+    }
+
+    res.status(200).json('Admin deleted');
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error)
+
+}
+}
+
+
+const superAdmin = {
+  email: "admin@gmail.com",
+  password: "admin@123",
+};
+
+
+const adminDetails = async (req, res) => {
+  try {
+    console.log("adminn",superAdmin);
+    if (superAdmin) {
+
+      const admin = await Admin.find()
+      console.log(admin);
+      res.status(200).json(admin);
+    }else{
+      res.status(500).json("You have no access to this page")
+    }
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error)
+  }
+
+}
+
+
+
+
 module.exports = {
   addUser,
   allUsers,
@@ -651,103 +721,9 @@ module.exports = {
   Signup,
   deleteUser,
   updateUser,
-  Logout
+  Logout,
+  adminDetails,
+  adminDelete
 };
 
 
-
-
-
-//search user
-// export const searchUser = async (req, res) => {
-//   try {
-//     const keyword = req.query.name || "";
-//     const users = await UserModel.find({
-//       $or: [
-//         { username: { $regex: keyword, $options: "i" } },
-//         { firstname: { $regex: keyword, $options: "i" } },
-//         { lastname: { $regex: keyword, $options: "i" } },
-//       ],
-//     }).select({ username: 1, firstname: 1, lastname: 1, profilePicture: 1 });
-//     res.status(200).json(users);
-//   } catch (err) {
-//     res.status(404).json({err,message:'Not found'});
-//     console.log(err);
-//   }
-// };
-
-
-
-// import React from "react";
-// import "./Search.css";
-// import { Link } from "react-router-dom";
-// import useSearchUsers from "../../hooks/useSearchUsers";
-// const serverPublic = process.env.REACT_APP_PUBLIC_FOLDER;
-
-// const Search = ({ searchKey }) => {
-//   const { users, loading, error } = useSearchUsers(searchKey);
-//   return (
-//     users.length > 0 && (
-//       <div className="search-result">
-//         {users?.map((user) => (
-//           <div key={user._id} className="search-items">
-//             <img
-//               src={
-//                 user?.profilePicture
-//                   ? serverPublic + user.profilePicture
-//                   : serverPublic + "defaultProfile.png"
-//               }
-//               alt=""
-//             />
-//             <div className="search-name">
-//               <span>
-//                 <Link to={`/profile/${user._id}`}>
-//                   {user.firstname} {user.lastname}
-//                 </Link>
-//               </span>
-//               <span>
-//                 <Link to={`/profile/${user._id}`}>{user.username}</Link>
-//               </span>
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-//     )
-//   );
-// };
-
-// export default Search;
-
-
-// import React from "react";
-// import Logo from "../../img/logo.png";
-// import { UilSearch } from "@iconscout/react-unicons";
-// import "./LogoSearch.css";
-// import { Link } from "react-router-dom";
-// import { useState } from "react";
-// import Search from "../Search/Search";
-
-// const LogoSearch = () => {
-  
-//   const [searchKey, setSearchKey] = useState("");
-//   return (
-//     <div className="LogoSearch">
-//       <Link to="/home">
-//         <img src={Logo} alt="" />
-//       </Link>
-//       <div className="Search">
-//         <input
-//           type="text"
-//           placeholder="Search"
-//           onChange={(e) => setSearchKey(e.target.value)}
-//         />
-//         <div className="s-icon">
-//           <UilSearch />
-//         </div>
-//         {searchKey.trim().length > 0 && <Search searchKey={searchKey} />}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default LogoSearch;

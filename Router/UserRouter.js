@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {Signup,Login,addUser,allUsers,collectionList,pay,transactionPay,deleteUser,updateUser} = require('../Controller/UserController');
+const {Signup,Login,addUser,allUsers,collectionList,pay,transactionPay,deleteUser,updateUser, adminDetails, adminDelete} = require('../Controller/UserController');
 const {sendOTPVerificationEmail,otpVerify}=require('../Controller/otpController')
 const {validateUserToken}=require('../Middleware/jwtAuth')
 
@@ -19,6 +19,9 @@ router.post('/pay',pay)
 router.post('/transactionPay',transactionPay)
 router.delete('/deleteUser/:id',deleteUser)
 router.post('/updateUser',updateUser)
+router.get('/adminDetails', adminDetails)
+router.delete('/adminDelete',adminDelete)
+
 
 
 module.exports=router

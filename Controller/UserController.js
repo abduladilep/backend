@@ -24,7 +24,7 @@ const addUser = async (req, res) => {
     collectionDate,
     collectionPeriod,
     collectionEndDate,
-  } = req.body;
+  } = req.body.reqObj;
 
   const newUser = new User({
     Name,
@@ -50,6 +50,7 @@ const addUser = async (req, res) => {
     console.log(newUser, "saved");
   } catch (error) {
     res.status(500).json(error);
+    console.log(error,"eroooooooeeee");
   }
 };
 
@@ -198,8 +199,8 @@ const collectionList = async (req, res) => {
 
 const pay = async (req, res) => {
  
-  const userId = req.body.userId;
-  const amount = req.body.amount;
+  const userId = req.body.reqObj.userId;
+  const amount = req.body.reqObj.amount;
   // const {userId, amount} =req.body;
 
   try {
@@ -228,10 +229,10 @@ const pay = async (req, res) => {
 
 
     if (updatedTotalAmount < 0) {
-      res
-        .status(401)
-        .json({ "money more than remaining amount": TotalAmountCopy });
+      res.status(422).json(TotalAmountCopy);
 
+        
+      
       console.log("no moneyyy bhaiiii");
     } else {
       console.log("iffffffffffffffffffff=====>");
@@ -334,7 +335,7 @@ const pay = async (req, res) => {
      // Calculating Total Collected Amount and pushing
         user.TotalCollected = TotalAmount - updatedTotalAmount;
 
-        res.status(200).json("Paid");
+        res.status(200).json("Transaction Successful!");
       }
 
 
@@ -373,8 +374,8 @@ const pay = async (req, res) => {
 const transactionPay = async (req, res) => {
   // const amount = req.body.amount;
   // const userId = req.params.id;
-  const{userId,amount} = req.body
-  console.log(amount,userId),"jjjjjj";
+  const{userId,amount} = req.body.reqObj
+  console.log(amount,userId);
 
   try {
     const user = await User.findById(userId);
@@ -390,12 +391,13 @@ const transactionPay = async (req, res) => {
     
     if (updatedTotalAmount < 0) {
       res
-      .status(401)
-      .json({ "money more than remaining amount": TotalAmountCopy });
+      .status(422)
+      .json(TotalAmountCopy );
+      // res.json({"money more than remaining amount": TotalAmountCopy });
       
       console.log("no moneyyy bhaiiii");
     } else {
-      console.log("iffffffffffffffffffff=====>");
+      console.log("iffffffffffffffffffff=====>"); 
       TotalAmountHistory.push((updatedTotalAmount));
 
       
@@ -466,6 +468,7 @@ const transactionPay = async (req, res) => {
         TodayProfit: {
           date: currentDate,
           Profit: profit,
+
         },
       },
       TotalAmountCopy: updatedTotalAmount,
@@ -479,7 +482,7 @@ console.log(TotalProfit,TotalCollected, user.InterestPercentage);
 
 
     // Return the updated user or appropriate response
-    res.json("send");
+    res.status(200).json("Transaction Successful!");
     }
   } catch (error) {
     // Handle error
@@ -546,7 +549,7 @@ const Signup = async (req, res) => {
     // const oldUser = await Admin.findOne({ mobile:mobile })
     // console.log("old", oldUser);
     // if (oldUser) {
-    //   return res.status(400).json({ message: "Username  already exist" })
+      // return res.status(400).json({ status:"exist"});
     // }
 
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -561,10 +564,10 @@ const Signup = async (req, res) => {
     console.log("admin====>", admin);
     const newAdmin=await admin.save()
     console.log("Password",newAdmin);
-    res.status(200).json({ status:"ok"});
+    res.status(200).json({ status:"ok",});
   } catch (error) {
     console.log(error);
-    res.status(500).json("Signup Failed");
+    res.status(500).json({status:"fail"});
   }
 };
 
@@ -606,11 +609,13 @@ const Login = async (req, res, next) => {
 // delete customer
 
 const deleteUser = async (req, res) => {
-  const id = req.params.id;
+  const {userId} =req.body;
+  console.log(req.body);
   try {
-    await User.findByIdAndDelete(id);
+    await User.findByIdAndDelete(userId);
     res.status(200).json('customer deleted');
   } catch (error) {
+    console.log(error);
     res.status(500).json(error);
   }
 };
@@ -623,6 +628,7 @@ const updateUser = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(id, req.body, { new: true });
     res.status(200).json({ user });
+    console.log(user,"uuuuuuus");
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
@@ -673,9 +679,11 @@ console.log(adminId,"amdiniddd");
       return res.status(404).json("Admin not found");
     }
 
-    res.status(200).json('Admin deleted');
+    res.status(200).json('Admin deleted !');
 
   } catch (error) {
+
+
     console.log(error);
     res.status(500).json(error)
 

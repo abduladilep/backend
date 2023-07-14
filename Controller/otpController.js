@@ -32,9 +32,17 @@ let transporter = nodemailer.createTransport({
 })
 
  const sendOTPVerificationEmail = async (req, res) => {
-    const email = req.body.email;
-const superAdmin= "adilep7165@gmail.com"
-if(email===superAdmin) {
+
+     const email = req.body.email;
+     const mobile=req.body.mobile;
+//  const superAdmin= "adilep7165@gmail.com"
+    const oldUser = await Admin.findOne({ mobile:mobile })
+    console.log("old", oldUser);
+    if (oldUser) {
+      return res.status(400).json({ status:"exist"});
+    }
+
+// if(email===superAdmin) {
 
     console.log(email,"email in otp");
     const exist_otp = await OtpVerification.findOne({ email });
@@ -83,10 +91,10 @@ if(email===superAdmin) {
             })
         }
     // }
-}else{
-    console.log("error");
+// }else{
+//     console.log("error");
 
-}
+// }
 
 }
 

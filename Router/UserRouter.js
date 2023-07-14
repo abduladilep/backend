@@ -10,14 +10,14 @@ router.post('/verifyotp', otpVerify);
 router.post('/login',Login)
 
 
-router.post('/addUser',addUser)
+router.post('/addUser',validateUserToken,addUser)
 router.get('/allUsers',allUsers)
 // router.get('/pendingList',userController.pendingList)
 
 router.get('/collectionList',collectionList)
-router.post('/pay',pay)
-router.post('/transactionPay',transactionPay)
-router.delete('/deleteUser/:id',deleteUser)
+router.post('/pay',validateUserToken,pay)
+router.post('/transactionPay',validateUserToken,transactionPay)
+router.delete('/deleteUser',deleteUser)
 router.post('/updateUser',updateUser)
 router.get('/adminDetails', adminDetails)
 router.delete('/adminDelete',adminDelete)

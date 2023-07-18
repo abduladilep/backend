@@ -22,9 +22,13 @@ let transporter = nodemailer.createTransport({
     service: "Gmail",
     
     auth: {
+       
+
         
-        user: `adilep7165@gmail.com`,
-        pass: `clmdzuatjaueqdcg`
+        // user: `adilep7165@gmail.com`,
+        // pass: `clmdzuatjaueqdcg`
+         user: `kingspacefinance24@gmail.com`,
+        pass: `asghtulrtdszrxre`
         
         
         
@@ -61,7 +65,7 @@ let transporter = nodemailer.createTransport({
             console.log("otppppp==>",otp);
             const mailOptions = {
                 // from: process.env.AUTH_EMAIL,
-                from:"adilep916@gmail.com",
+                from:"kingspacefinance24@gmail.com",
                 to: email,
                 subject: "Verify your email",
                 html: `<p>Enter <b>${otp}</b> in the app to verify your email address and complete the sign up </p><p> This code <b> Expires in 10 Minutes</b>.</p>`

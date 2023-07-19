@@ -19,7 +19,7 @@ app.use(express.json());
 
 
 
-app.use('/api/user',require('./Router/UserRouter'))
+app.use('/backend/api/user',require('./Router/UserRouter'))
 
 
 

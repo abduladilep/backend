@@ -580,6 +580,7 @@ const Login = async (req, res, next) => {
 
   const admin = await Admin.findOne({ mobile: mobile });
   if (admin) {
+    
     const validPassword = await bcrypt.compare(password, admin.password);
 
     console.log("validPassword", validPassword);

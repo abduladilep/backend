@@ -3,17 +3,6 @@ const OtpVerification = require('../Model/otpVerify');
 const Admin = require('../Model/AdminModel');
 const nodemailer = require('nodemailer');
 
-// let transporter = nodemailer.createTransport({
-//     host: "smtp.gmail.com",
-//     port: 587,
-//     auth: {
-//         // user: process.env.AUTH_EMAIL,
-//         // pass: process.env.AUTH_PASS
-//         user:"adilep916@gmail.com",
-//         pass:"9061634916"
-//     }
-// })
-
 
 let transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -23,10 +12,6 @@ let transporter = nodemailer.createTransport({
     
     auth: {
        
-
-        
-        // user: `adilep7165@gmail.com`,
-        // pass: `clmdzuatjaueqdcg`
          user: `kingspacefinance24@gmail.com`,
         pass: `asghtulrtdszrxre`
         
